@@ -112,9 +112,11 @@ menudefs = [
    ('_About IDLE', '<<about-idle>>'),
    None,
    ('_IDLE Doc', '<<help>>'),
+   ('ChatGPT', '<<chat>>'),
    ('Python _Docs', '<<python-docs>>'),
    ]),
 ]
+
 
 if find_spec('turtledemo'):
     menudefs[-1][1].append(('Turtle Demo', '<<open-turtle-demo>>'))

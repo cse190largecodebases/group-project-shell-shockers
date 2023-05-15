@@ -62,6 +62,7 @@ class EditorWindow:
     from idlelib.format import FormatParagraph, FormatRegion, Indents, Rstrip
     from idlelib.parenmatch import ParenMatch
     from idlelib.zoomheight import ZoomHeight
+    from idlelib.chat import Chat
 
     filesystemencoding = sys.getfilesystemencoding()  # for file names
     help_url = None
@@ -173,6 +174,7 @@ class EditorWindow:
         text.bind("<<paste>>", self.paste)
         text.bind("<<center-insert>>", self.center_insert_event)
         text.bind("<<help>>", self.help_dialog)
+        text.bind("<<chat>>", self.chat_dialog) 
         text.bind("<<python-docs>>", self.python_docs)
         text.bind("<<about-idle>>", self.about_dialog)
         text.bind("<<open-config-dialog>>", self.config_dialog)
@@ -602,6 +604,17 @@ class EditorWindow:
         else:
             parent = self.top
         help.show_idlehelp(parent)
+        return "break"
+
+    def chat_dialog(self, event=None):
+        "Handle Chat Dialog event."
+        # Synchronize with macosx.overrideRootMenu.help_dialog.
+        if self.root:
+            parent = self.root
+        else:
+            parent = self.top
+
+        self.Chat.show_chat(parent)
         return "break"
 
     def python_docs(self, event=None):
