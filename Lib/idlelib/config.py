@@ -656,6 +656,7 @@ class IdleConf:
             '<<run-custom>>': ['<Shift-Key-F5>'],
             '<<check-module>>': ['<Alt-Key-x>'],
             '<<zoom-height>>': ['<Alt-Key-2>'],
+            '<<chat>>' : ['<Control-Key-Right>'],
             }
 
         if keySetName:
