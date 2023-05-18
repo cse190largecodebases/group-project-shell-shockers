@@ -2,6 +2,11 @@ import tkinter as tk
 from tkinter import ttk
 
 class Chat:
+
+    def show_chat(parent):
+        chat_app = Chat()
+        chat_app.run()
+
     def __init__(self):
         self.window = tk.Tk()
         self.window.title("ChatGPT")
@@ -50,5 +55,4 @@ class Chat:
             self.chat_box.configure(state=tk.DISABLED)
 
 # Create an instance of the Chat class
-chat_app = Chat()
-chat_app.run()
+
