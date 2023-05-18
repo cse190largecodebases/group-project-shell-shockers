@@ -1,4 +1,6 @@
 import idlelib
 
 class Chat:
-    pass
+    
+    def show_chat(parent):
+        pass
