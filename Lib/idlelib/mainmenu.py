@@ -112,6 +112,7 @@ menudefs = [
    ('_About IDLE', '<<about-idle>>'),
    None,
    ('_IDLE Doc', '<<help>>'),
+   ('ChatGPT', '<<chat>>'),
    ('Python _Docs', '<<python-docs>>'),
    ]),
 ]
