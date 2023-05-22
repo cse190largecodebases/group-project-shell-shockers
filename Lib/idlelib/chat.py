@@ -1,4 +1,5 @@
 import tkinter as tk
+import os
 from tkinter import ttk
 
 class Chat:
@@ -12,6 +13,9 @@ class Chat:
         self.window.title("ChatGPT")
         self.window.geometry("500x400")
         self.window.configure(bg="#f0f0f0")
+
+        # Bind the window close event to the terminate method
+        self.window.protocol("WM_DELETE_WINDOW", self.terminate)
 
         # Create the chat display
         self.chat_box = tk.Text(self.window, height=15, width=60, state=tk.DISABLED,
@@ -40,6 +44,11 @@ class Chat:
     def run(self):
         self.window.mainloop()
 
+    def terminate(self):
+        self.window.destroy()
+        self.window.quit()  # Exit the tkinter event loop
+
+
     def send_message(self):
         message = self.entry.get()
         if message.strip() != "":
@@ -53,6 +62,3 @@ class Chat:
             self.chat_box.configure(state=tk.NORMAL)
             self.chat_box.insert(tk.END, response + "\n")
             self.chat_box.configure(state=tk.DISABLED)
-
-# Create an instance of the Chat class
-
