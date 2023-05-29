@@ -4,8 +4,23 @@ from tkinter import ttk
 class Chat:
 
     def show_chat(parent):
+        Chat.get_api_key()
         chat_app = Chat()
         chat_app.run()
+
+    def get_api_key():
+        try:
+            with open("API_KEY.txt", "r") as file:
+                api_key = file.readline().strip()
+                print(api_key)
+                if api_key:
+                    return api_key
+
+        except FileNotFoundError:
+            print("API_KEY.txt file not found. Creating a new file...")
+            with open("API_KEY.txt", "w") as file:
+                pass
+
 
     def __init__(self):
         self.window = tk.Tk()
