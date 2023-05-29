@@ -20,7 +20,26 @@ class ChatTest(unittest.TestCase):
 
         self.assertEqual(actual_text, expected_text)
 
+    ## Makes sure the window launches correctly when called
+    def test_show_chat(self):
+        chat_app = Chat()
+        chat_app.window.update()  # Update the window to ensure correct geometry calculations
+        window_title = chat_app.window.title()
+        window_geometry = chat_app.window.geometry()
 
+        expected_title = "ChatGPT"
+        expected_width = 500
+        expected_height = 400
+
+        self.assertEqual(window_title, expected_title)
+
+        # Extract width and height from the window geometry string
+        geometry_parts = window_geometry.split('+')
+        actual_geometry = geometry_parts[0]
+        actual_width, actual_height = map(int, actual_geometry.split('x'))
+
+        self.assertEqual(actual_width, expected_width)
+        self.assertEqual(actual_height, expected_height)
 
 
 if __name__ == '__main__':
