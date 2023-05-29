@@ -34,6 +34,8 @@ class ChatTest(unittest.TestCase):
         self.assertEqual(window_title, expected_title)
 
         # Extract width and height from the window geometry string
+        # Keeps adding random vlaues to height with each rerun ie '400+260+160'
+        # So spilting to get rid of the additional values and getting the base height
         geometry_parts = window_geometry.split('+')
         actual_geometry = geometry_parts[0]
         actual_width, actual_height = map(int, actual_geometry.split('x'))
