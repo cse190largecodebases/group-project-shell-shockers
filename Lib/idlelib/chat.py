@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
-
+## Find a way to import a chatgpt api key
 class Chat:
 
     def show_chat(parent):
