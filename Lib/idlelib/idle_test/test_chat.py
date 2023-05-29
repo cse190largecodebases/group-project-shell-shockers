@@ -1,5 +1,6 @@
 import unittest
 from tkinter import Tk
+import tkinter as tk
 from chat import Chat
 
 class ChatTest(unittest.TestCase):
@@ -44,5 +45,15 @@ class ChatTest(unittest.TestCase):
         self.assertEqual(actual_height, expected_height)
 
 
+    def test_terminate(self):
+        chat_app = Chat()
+        self.assertTrue(chat_app.window.winfo_exists())
+
+        # Call the terminate method
+        chat_app.terminate()
+
+        # Check if the window is destroyed
+        with self.assertRaises(tk.TclError):
+            chat_app.window.winfo_exists()
 if __name__ == '__main__':
     unittest.main()
