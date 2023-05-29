@@ -44,7 +44,7 @@ class ChatTest(unittest.TestCase):
         self.assertEqual(actual_width, expected_width)
         self.assertEqual(actual_height, expected_height)
 
-
+   ## Tests if windoe process terminates correctly
     def test_terminate(self):
         chat_app = Chat()
         # Checking the window launch correctly
