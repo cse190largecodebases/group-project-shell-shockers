@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from langchain.llms import OpenAI
 
 class Chat:
 
