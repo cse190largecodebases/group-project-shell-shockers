@@ -2,11 +2,12 @@ import tkinter as tk
 from tkinter import ttk
 ## Find a way to import a chatgpt api key
 class Chat:
-
+    
     def show_chat(parent):
-        Chat.get_api_key()
-        chat_app = Chat()
-        chat_app.run()
+        key = Chat.get_api_key()
+        if key :
+            chat_app = Chat()
+            chat_app.run()
 
     def get_api_key():
         open_window = True
@@ -14,7 +15,6 @@ class Chat:
             with open("API_KEY.txt", "r") as file:
                 api_key = file.readline().strip()
                 if api_key:
-                    open_window = False
                     return api_key
 
         except FileNotFoundError:
@@ -22,7 +22,11 @@ class Chat:
                 pass
 
         if open_window:
-            Chat.api_key_window()        
+            Chat.api_key_window()
+            with open("API_KEY.txt", "r") as file:
+                api_key = file.readline().strip()
+                if api_key:
+                    return api_key        
     
     def api_key_window():
         def submit():
@@ -32,12 +36,16 @@ class Chat:
                 with open("API_KEY.txt", "w") as file:
                     file.write(entered_api_key)
                     root.quit()
-                return entered_api_key
+
+        def on_close():
+            root.destroy()
+            root.quit()
 
         root = tk.Tk()
         root.title("ChatGPT")
         root.geometry("500x400")
         root.configure(bg="#f0f0f0")
+        root.protocol("WM_DELETE_WINDOW", on_close)
 
         label = tk.Label(root, text="Please enter your API key:", font=("Arial", 12), bg="#f0f0f0")
         label.pack(pady=10)
