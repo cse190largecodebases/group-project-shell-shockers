@@ -629,7 +629,7 @@ class EditorWindow:
             os.remove("API_KEY.txt")
         except: 
             pass
-        #self.Chat.show_chat(parent)
+        self.Chat.show_chat(parent)
         return "break"    
 
     def python_docs(self, event=None):
