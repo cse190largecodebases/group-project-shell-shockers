@@ -1,7 +1,8 @@
 import unittest
 from tkinter import Tk
 import tkinter as tk
-from chat import Chat
+from idlelib.chat import Chat
+from unittest.mock import patch, MagicMock, mock_open
 
 class ChatTest(unittest.TestCase):
     ## Tests the text a user sends will be the same one used or processing and displaying
@@ -45,6 +46,18 @@ class ChatTest(unittest.TestCase):
         self.assertEqual(actual_height, expected_height)
 
    ## Tests if windoe process terminates correctly
+    ## Tests the launch of the chat event
+    @patch('idlelib.chat.Chat.get_api_key')
+    @patch('idlelib.chat.Chat')
+    def test_show_chat2(self, mock_Chat, mock_get_api_key):
+        mock_get_api_key.return_value = True
+
+        Chat.show_chat(None)
+
+        mock_get_api_key.assert_called_once()
+        mock_Chat.assert_called_once()
+        mock_Chat.return_value.run.assert_called_once()
+
     def test_terminate(self):
         chat_app = Chat()
         # Checking the window launch correctly
@@ -58,5 +71,24 @@ class ChatTest(unittest.TestCase):
         # Asserting the error is thrown
         with self.assertRaises(tk.TclError):
             chat_app.window.winfo_exists()
+
+    ## Tests the API_KEY file is made
+    def test_get_api_key_file_exists(self):
+        # Create a temporary API_KEY.txt file
+        with open("API_KEY.txt", "w") as file:
+            file.write("test_api_key")
+
+        api_key = Chat.get_api_key()
+
+        self.assertEqual(api_key, "test_api_key")
+
+    ## Tests the API_KEY file does not exist
+    def test_get_api_key_file_not_exists(self):
+        api_key = Chat.get_api_key()
+
+        self.assertIsNotNone(api_key)
+
+
+
 if __name__ == '__main__':
     unittest.main()
