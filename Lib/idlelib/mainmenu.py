@@ -113,6 +113,7 @@ menudefs = [
    None,
    ('_IDLE Doc', '<<help>>'),
    ('ChatGPT', '<<chat>>'),
+   ('Change API Key', '<<change_api_key>>'),
    ('Python _Docs', '<<python-docs>>'),
    ]),
 ]

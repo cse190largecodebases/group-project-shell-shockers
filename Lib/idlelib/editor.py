@@ -174,7 +174,8 @@ class EditorWindow:
         text.bind("<<paste>>", self.paste)
         text.bind("<<center-insert>>", self.center_insert_event)
         text.bind("<<help>>", self.help_dialog)
-        text.bind("<<chat>>", self.chat_dialog) 
+        text.bind("<<chat>>", self.chat_dialog)
+        text.bind("<<change_api_key>>", self.change_api) 
         text.bind("<<python-docs>>", self.python_docs)
         text.bind("<<about-idle>>", self.about_dialog)
         text.bind("<<open-config-dialog>>", self.config_dialog)
@@ -616,6 +617,20 @@ class EditorWindow:
 
         self.Chat.show_chat(parent)
         return "break"
+
+    def change_api(self, event=None):
+        "Handle Change API Key Event."
+        # Synchronize with macosx.overrideRootMenu.help_dialog.
+        if self.root:
+            parent = self.root
+        else:
+            parent = self.top
+        try:
+            os.remove("API_KEY.txt")
+        except: 
+            pass
+        self.Chat.show_chat(parent)
+        return "break"    
 
     def python_docs(self, event=None):
         if sys.platform[:3] == 'win':
