@@ -2,7 +2,7 @@ import unittest
 from tkinter import Tk
 import tkinter as tk
 from idlelib.chat import Chat
-from unittest.mock import patch, MagicMock, mock_open
+from unittest.mock import patch
 
 class ChatTest(unittest.TestCase):
     ## Tests the text a user sends will be the same one used or processing and displaying
