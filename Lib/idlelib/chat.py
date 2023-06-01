@@ -1,11 +1,66 @@
 import tkinter as tk
 from tkinter import ttk
-
+## Find a way to import a chatgpt api key
 class Chat:
-
+    
     def show_chat(parent):
-        chat_app = Chat()
-        chat_app.run()
+        key = Chat.get_api_key()
+        if key :
+            chat_app = Chat()
+            chat_app.run()
+
+    def get_api_key():
+        open_window = True
+        try:
+            with open("API_KEY.txt", "r") as file:
+                api_key = file.readline().strip()
+                if api_key:
+                    return api_key
+
+        except FileNotFoundError:
+            with open("API_KEY.txt", "w") as file:
+                pass
+
+        if open_window:
+            Chat.api_key_window()
+            with open("API_KEY.txt", "r") as file:
+                api_key = file.readline().strip()
+                if api_key:
+                    return api_key        
+    
+    def api_key_window():
+        def submit():
+            entered_api_key = entry.get().strip()
+            if entered_api_key:
+                root.destroy()
+                with open("API_KEY.txt", "w") as file:
+                    file.write(entered_api_key)
+                    root.quit()
+
+        def on_close():
+            root.destroy()
+            root.quit()
+
+        root = tk.Tk()
+        root.title("ChatGPT")
+        root.geometry("500x400")
+        root.configure(bg="#f0f0f0")
+        root.protocol("WM_DELETE_WINDOW", on_close)
+
+        label = tk.Label(root, text="Please enter your API key:", font=("Arial", 12), bg="#f0f0f0")
+        label.pack(pady=10)
+
+        entry = tk.Entry(root, width=60, font=("Arial", 12))
+        entry.pack()
+
+        submit_button_style = ttk.Style()
+        submit_button_style.configure("SubmitButton.TButton", font=("Arial", 12))
+
+        submit_button = ttk.Button(root, text="Submit", style="SubmitButton.TButton", command=submit)
+        submit_button.pack(pady=10)
+
+        root.mainloop()
+
 
     def __init__(self):
         self.window = tk.Tk()
