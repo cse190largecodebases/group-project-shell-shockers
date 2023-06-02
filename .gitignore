@@ -2,6 +2,9 @@
 # First, rules intended to apply in all subdirectories.
 # These contain no slash, or only a trailing slash.
 
+cpython-venv
+my-env
+
 *.cover
 *.iml
 *.o
@@ -39,9 +42,9 @@ gmon.out
 .mypy_cache/
 .pytest_cache/
 .DS_Store
-
+API_KEY.txt
 *.exe
-
+*.env
 # Ignore core dumps... but not Tools/msi/core/ or the like.
 core
 !core/

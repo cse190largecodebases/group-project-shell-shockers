@@ -1,5 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
+from idlelib.langchain.llms import OpenAI
+
 
 class Chat:
     def __init__(self):

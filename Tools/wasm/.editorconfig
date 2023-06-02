@@ -1,3 +1,5 @@
+
+
 root = false  # This extends the root .editorconfig
 
 [*.{html,js}]
