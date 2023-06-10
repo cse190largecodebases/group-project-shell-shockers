@@ -82,11 +82,7 @@ class Chat:
 
         # Create the general tab
         self.create_general_tab()
-
-        # Create a button to add new tabs
-        # self.add_tab_button = ttk.Button(self.window, text="Add Tab", command=self.add_tab)
-        # self.add_tab_button.pack(pady=10)
-
+        
     def create_chat_tab(self):
         # Create a new tab for chat
         chat_tab = ttk.Frame(self.notebook)

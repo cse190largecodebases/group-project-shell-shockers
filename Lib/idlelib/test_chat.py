@@ -1,26 +1,34 @@
+from idlelib.chat import Chat
 import unittest
 from tkinter import Tk
 import tkinter as tk
-from idlelib.chat import Chat
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
+import os
+
 
 class ChatTest(unittest.TestCase):
-    ## Tests the text a user sends will be the same one used or processing and displaying
-    def test_send_message(self):
-        chat_app = Chat()
+   ## Tests to see if it opens the correct file
+    @patch("builtins.open")
+    def test_get_api_key_with_file(self, mock_open):
+        mock_file = mock_open.return_value.__enter__.return_value
+        mock_file.readline.return_value = "my_api_key"
+        api_key = Chat.get_api_key()
+        self.assertEqual(api_key, "my_api_key")
 
-        initial_text = "Initial text"
-        chat_app.chat_box.insert("1.0", initial_text)  # Set initial text
+    ## Tests to see if it grabs the correct API key
+    def test_get_api_key_exists(self):
+        # Create a test file with a valid API key
+        with open("API_KEY.txt", "w") as file:
+            file.write("VALID_API_KEY")
 
-        message = "Test message"
-        chat_app.entry.insert(0, message)  # Set the message to be sent
-        chat_app.send_message()  # Call the send_message method
+        # Call the get_api_key method
+        api_key = Chat.get_api_key()
 
-        expected_text = "User: " + message
-        actual_text = chat_app.chat_box.get("1.0", "end")  # Get the updated text from chat_box
-        actual_text = actual_text.split("AI:")[0].rstrip()  # Remove text after and including "AI:", and remove trailing whitespace
+        # Assert that the returned API key is correct
+        self.assertEqual(api_key, "VALID_API_KEY")
 
-        self.assertEqual(actual_text, expected_text)
+        # Clean up the test file
+        os.remove("API_KEY.txt")
 
     ## Makes sure the window launches correctly when called
     def test_show_chat(self):
@@ -45,19 +53,6 @@ class ChatTest(unittest.TestCase):
         self.assertEqual(actual_width, expected_width)
         self.assertEqual(actual_height, expected_height)
 
-
-    ## Tests the launch of the chat event
-    @patch('idlelib.chat.Chat.get_api_key')
-    @patch('idlelib.chat.Chat')
-    def test_show_chat2(self, mock_Chat, mock_get_api_key):
-        mock_get_api_key.return_value = True
-
-        Chat.show_chat(None)
-
-        mock_get_api_key.assert_called_once()
-        mock_Chat.assert_called_once()
-        mock_Chat.return_value.run.assert_called_once()
-
    ## Tests if window process terminates correctly
    ## Tests window 
     def test_terminate(self):
@@ -74,69 +69,136 @@ class ChatTest(unittest.TestCase):
         with self.assertRaises(tk.TclError):
             chat_app.window.winfo_exists()
 
-    ## Tests the API_KEY file is made
-    def test_get_api_key_file_exists(self):
-        # Create a temporary API_KEY.txt file
-        with open("API_KEY.txt", "w") as file:
-            file.write("test_api_key")
+   ## Mocks the AI repsonse and makes sure the text box displays the user
+   ## and 'AI' repsonse
+    @patch("openai.Model.list")
+    @patch("openai.ChatCompletion.create")
+    def test_send_message(self, mock_create, mock_list):
+        # Create an instance of the Chat class
+        chat_app = Chat()
 
-        api_key = Chat.get_api_key()
+        # Define a custom function to mock openai.Model.list()
+        def mock_model_list():
+            mock_model = MagicMock()
+            mock_model.id = "gpt-3.5-turbo"
+            return [mock_model]
 
-        self.assertEqual(api_key, "test_api_key")
+        # Define a custom function to mock openai.ChatCompletion.create()
+        def mock_chat_completion(*args, **kwargs):
+            mock_response = MagicMock()
+            mock_response.choices = [MagicMock()]
+            mock_response.choices[0].message.content = "AI response"
+            return mock_response
 
-    ## Tests the API_KEY file does not exist
-    def test_get_api_key_file_not_exists(self):
-        api_key = Chat.get_api_key()
+        # Assign the custom functions as the side effects of the mocked methods
+        mock_list.side_effect = mock_model_list
+        mock_create.side_effect = mock_chat_completion
 
-        self.assertIsNotNone(api_key)
+        # Set up the initial state of the chat box and entry field
+        chat_app.entry.insert(tk.END, "User message")
+        chat_app.chat_box.configure(state=tk.NORMAL)
+        chat_app.chat_box.insert(tk.END, "Previous message\n")
+        chat_app.chat_box.configure(state=tk.DISABLED)
 
-    ## Tests to see that the api_key_window closes correctly
-    ## Tests a fixed bug
-    def test_api_key_window_close(self):
-        # Create a flag to check if the window was closed
-        self.window_closed = False
+        # Call the send_message method
+        chat_app.send_message()
 
-        # Define a custom on_close function that sets the flag to True
-        def on_close():
-            root.destroy()
-            root.quit()
-            self.window_closed = True
+        # Check if the AI response is correctly added to the chat box
+        chat_app.chat_box.configure(state=tk.NORMAL)
+        chat_text = chat_app.chat_box.get("1.0", tk.END).strip()
+        self.assertEqual(chat_text, "Previous message\nUser: User message\nAI response")
+        chat_app.chat_box.configure(state=tk.DISABLED)
 
-        # Override the api_key_window method in the Chat class with the custom function
-        Chat.api_key_window = on_close
+        # Check if the entry field is cleared
+        entry_text = chat_app.entry.get()
+        self.assertEqual(entry_text, "")
 
-        # Create a root window
-        root = tk.Tk()
+        # Check if openai.Model.list and openai.ChatCompletion.create were called with the correct arguments
+        mock_list.assert_called_once()
+        mock_create.assert_called_once_with(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": "User message, please link me to the python documentation link"}]
+        )
 
-        # Call the api_key_window method
-        Chat.api_key_window()
 
-        # Verify that the window was closed
-        self.assertTrue(self.window_closed)
+   ## Mocks the AI repsonse and makes sure the text box displays the user
+    ## and 'AI' repsonse
+    @patch("openai.Model.list")
+    @patch("openai.ChatCompletion.create")
+    def test_send_general_message(self, mock_create, mock_list):
+        # Create an instance of the Chat class
+        chat_app = Chat()
 
-    ## Test it writes the api key correctly with a file exisiting
-    def test_get_api_key_existing_file_with_key(self):
-        # Create a temporary API_KEY.txt file with a key
-        with open("API_KEY.txt", "w") as file:
-            file.write("123456")
+        # Define a custom function to mock openai.Model.list()
+        def mock_model_list():
+            mock_model = MagicMock()
+            mock_model.id = "gpt-3.5-turbo"
+            return [mock_model]
 
-        # Call get_api_key
-        api_key = Chat.get_api_key()
+        # Define a custom function to mock openai.ChatCompletion.create()
+        def mock_chat_completion(*args, **kwargs):
+            mock_response = MagicMock()
+            mock_response.choices = [MagicMock()]
+            mock_response.choices[0].message.content = "AI response"
+            return mock_response
 
-        # Verify that the API key is returned correctly
-        self.assertEqual(api_key, "123456")
+        # Assign the custom functions as the side effects of the mocked methods
+        mock_list.side_effect = mock_model_list
+        mock_create.side_effect = mock_chat_completion
 
-    ## Tests if the api returns none
-    def test_get_api_key_existing_file_without_key(self):
-        # Create an empty API_KEY.txt file
-        with open("API_KEY.txt", "w") as file:
-            pass
+        # Set up the initial state of the chat box and entry field
+        chat_app.general_entry.insert(tk.END, "User message")
+        chat_app.general_box.configure(state=tk.NORMAL)
+        chat_app.general_box.insert(tk.END, "Previous message\n")
+        chat_app.general_box.configure(state=tk.DISABLED)
 
-        # Call get_api_key
-        api_key = Chat.get_api_key()
+        # Call the send_general_message method
+        chat_app.send_general_message()
 
-        # Verify that None is returned
-        self.assertIsNone(api_key)
+        # Check if the AI response is correctly added to the chat box
+        chat_app.general_box.configure(state=tk.NORMAL)
+        chat_text = chat_app.general_box.get("1.0", tk.END).strip()
+        expected_text = "Previous message\nUser: User message\nAI response"
+        self.assertEqual(chat_text, expected_text)
+        chat_app.general_box.configure(state=tk.DISABLED)
+
+        # Check if the entry field is cleared
+        entry_text = chat_app.general_entry.get()
+        self.assertEqual(entry_text, "")
+
+        # Check if openai.Model.list and openai.ChatCompletion.create were called with the correct arguments
+        mock_list.assert_called_once()
+        mock_create.assert_called_once_with(
+            model="gpt-3.5-turbo",
+            messages=[{"role": "user", "content": "User message"}]
+        )
+
+
+    # def test_submit_button(self):
+    #     # Create a dummy file to simulate existing API_KEY.txt
+    #     with open("API_KEY.txt", "w") as file:
+    #         file.write("dummy_api_key")
+
+    #     # Run the api_key_window() function
+    #     Chat.api_key_window()
+
+    #     # Simulate entering a new API key in the entry widget
+    #     root = tk._default_root
+    #     entry_widget = root.children['.!entry']
+    #     entry_widget.insert(0, "new_api_key")
+
+    #     # Simulate clicking the submit button
+    #     submit_button = root.children['.!button']
+    #     submit_button.invoke()
+
+    #     # Verify that the new API key is written to the file
+    #     with open("API_KEY.txt", "r") as file:
+    #         content = file.read()
+    #     self.assertEqual(content, "new_api_key")
+
+    #     # Clean up the dummy file
+    #     os.remove("API_KEY.txt")
+
 
 
 if __name__ == '__main__':

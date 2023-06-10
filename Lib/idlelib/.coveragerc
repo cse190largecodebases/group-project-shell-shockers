@@ -1,0 +1,3 @@
+[run]
+include = idle_test/*
+branch = True
