@@ -7,6 +7,7 @@ import os
 
 
 class ChatTest(unittest.TestCase):
+
    ## Tests to see if it opens the correct file
     @patch("builtins.open")
     def test_get_api_key_with_file(self, mock_open):
@@ -14,6 +15,7 @@ class ChatTest(unittest.TestCase):
         mock_file.readline.return_value = "my_api_key"
         api_key = Chat.get_api_key()
         self.assertEqual(api_key, "my_api_key")
+
 
     ## Tests to see if it grabs the correct API key
     def test_get_api_key_exists(self):
@@ -29,6 +31,7 @@ class ChatTest(unittest.TestCase):
 
         # Clean up the test file
         os.remove("API_KEY.txt")
+
 
     ## Makes sure the window launches correctly when called
     def test_show_chat(self):
@@ -53,6 +56,7 @@ class ChatTest(unittest.TestCase):
         self.assertEqual(actual_width, expected_width)
         self.assertEqual(actual_height, expected_height)
 
+
    ## Tests if window process terminates correctly
    ## Tests window 
     def test_terminate(self):
@@ -68,6 +72,7 @@ class ChatTest(unittest.TestCase):
         # Asserting the error is thrown
         with self.assertRaises(tk.TclError):
             chat_app.window.winfo_exists()
+
 
    ## Mocks the AI repsonse and makes sure the text box displays the user
    ## and 'AI' repsonse
@@ -121,7 +126,7 @@ class ChatTest(unittest.TestCase):
         )
 
 
-   ## Mocks the AI repsonse and makes sure the text box displays the user
+    ## Mocks the AI repsonse and makes sure the text box displays the user
     ## and 'AI' repsonse
     @patch("openai.Model.list")
     @patch("openai.ChatCompletion.create")
@@ -172,33 +177,6 @@ class ChatTest(unittest.TestCase):
             model="gpt-3.5-turbo",
             messages=[{"role": "user", "content": "User message"}]
         )
-
-
-    # def test_submit_button(self):
-    #     # Create a dummy file to simulate existing API_KEY.txt
-    #     with open("API_KEY.txt", "w") as file:
-    #         file.write("dummy_api_key")
-
-    #     # Run the api_key_window() function
-    #     Chat.api_key_window()
-
-    #     # Simulate entering a new API key in the entry widget
-    #     root = tk._default_root
-    #     entry_widget = root.children['.!entry']
-    #     entry_widget.insert(0, "new_api_key")
-
-    #     # Simulate clicking the submit button
-    #     submit_button = root.children['.!button']
-    #     submit_button.invoke()
-
-    #     # Verify that the new API key is written to the file
-    #     with open("API_KEY.txt", "r") as file:
-    #         content = file.read()
-    #     self.assertEqual(content, "new_api_key")
-
-    #     # Clean up the dummy file
-    #     os.remove("API_KEY.txt")
-
 
 
 if __name__ == '__main__':
